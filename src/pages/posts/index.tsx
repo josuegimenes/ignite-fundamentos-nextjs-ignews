@@ -11,7 +11,7 @@ type Post = {
     slug: string;
     title: string;
     excerpt: string;
-    updated: string;
+    updatedAt: string;
 };
 
 interface PostsProps {
@@ -29,7 +29,7 @@ export default function Posts({ posts }: PostsProps) {
                 <div className={styles.posts}>
                     { posts.map(post => (
                         <a key={post.slug} href="#">
-                        <time>{post.updated}</time>
+                        <time>{post.updatedAt}</time>
                         <strong>{post.title}</strong>
                         <p>{post.excerpt}</p>
                     </a>
