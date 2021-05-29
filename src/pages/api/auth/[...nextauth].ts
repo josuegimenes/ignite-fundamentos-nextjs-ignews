@@ -37,7 +37,7 @@ export default NextAuth({
                 q.Index('subscription_by_status'),
                 "active"
               )
-              ])
+            ])
           )
         )
       } catch {
