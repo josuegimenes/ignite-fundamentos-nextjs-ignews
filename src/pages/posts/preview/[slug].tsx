@@ -58,9 +58,7 @@ export default function PostPreview({ post }: PostPreviewProps) {
 
 export const getStaticPaths: GetStaticPaths = async () => {
     return {
-        paths: [
-            { params: { slug: 'mapas-com-react-usando-leaflet' } }
-        ],
+        paths: [],
         fallback: 'blocking'
     }
 }
