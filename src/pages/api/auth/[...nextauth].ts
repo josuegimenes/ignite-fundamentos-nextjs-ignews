@@ -40,6 +40,11 @@ export default NextAuth({
             ])
           )
         )
+
+        return {
+          ...session,
+          activeSubscription: userActiveSubscription
+        }
       } catch {
         return {
           ...session,
@@ -77,6 +82,6 @@ export default NextAuth({
       } catch {
         return false
       }
-    },
+    }
   }
 })
