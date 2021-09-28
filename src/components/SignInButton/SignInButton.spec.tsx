@@ -13,7 +13,7 @@ describe('SignInButton component', () => {
 
     render(<SignInButton />)
 
-  expect(screen.getByText('Sign in with Github')).toBeInTheDocument()
+    expect(screen.getByText('Sign in with Github')).toBeInTheDocument()
   })
 
   it('renders correctly when user is authenticated', () => {
@@ -26,7 +26,7 @@ describe('SignInButton component', () => {
 
     render(<SignInButton />)
 
-  expect(screen.getByText('John Doe')).toBeInTheDocument()
+    expect(screen.getByText('John Doe')).toBeInTheDocument()
   })
 
 })
