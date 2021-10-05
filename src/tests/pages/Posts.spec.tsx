@@ -2,60 +2,83 @@ import { render, screen } from '@testing-library/react'
 import { mocked } from 'ts-jest/utils'
 
 import { getPrismicClient } from '../../services/prismic'
-import Posts, { getStaticProps } from '../../pages/posts'
+import Posts, { getServerSideProps } from '../../pages/posts/[slug]'
+import { getSession } from 'next-auth/client'
 
-const posts = [
+const post =
   {
     slug: 'my-new-post',
     title: 'My New Post',
-    excerpt: 'Post excerpt',
+    content: '<p>Post excerpt</p>',
     updatedAt: '29 de Setembro'
   }
-]
 
+jest.mock('next-auth/client')
 jest.mock('../../services/prismic')
 
 describe('Posts page', () => {
 
   it('should renders correctly', () => {
-    render(<Posts posts={posts} />)
+    render(<Posts post={post} />)
 
     expect(screen.getByText('My New Post')).toBeInTheDocument()
+    expect(screen.getByText('Post excerpt')).toBeInTheDocument()
   })
 
-  it('should loads initial data', async () => {
-    const getPrismicClientMocked = mocked(getPrismicClient)
+  it('redirects user if no subscription is found', async () => {
+    const getSessionMocked = mocked(getSession)
+    
+    getSessionMocked.mockResolvedValueOnce(null)
 
+    const response = await getServerSideProps({
+      params: { slug: 'my-new-post'}
+    } as any)
+
+    expect(response).toEqual(
+      expect.objectContaining({
+        redirect: expect.objectContaining({
+          destination: '/',
+        })
+      })
+    )
+    
+  })
+
+  it('loads initial data', async () => {
+    const getSessionMocked = mocked(getSession)
+    const getPrismicClientMocked = mocked(getPrismicClient)
+    
     getPrismicClientMocked.mockReturnValueOnce({
-      query: jest.fn().mockResolvedValueOnce({
-        results: [
-          {
-            uid: 'my-new-post',
-            data: {
-              title: [
-                { title: 'heading', text: 'My New Post'}
-              ],
-              content: [
-                { type: 'paragraph', text: 'Post excerpt' }
-              ],
-            },
-            last_publication_date: '09-28-2021'
-          }
-        ]
+      getByUID: jest.fn().mockResolvedValueOnce({
+        data: {
+          title: [
+            { type: 'heading', text: 'My new post' }
+          ],
+          content: [
+            { type: 'paragraph', text: 'Post content' }
+          ],
+        },
+        last_publication_date: '10-04-2021'
       })
     } as any)
 
-    const response = await getStaticProps({})
+    getSessionMocked.mockResolvedValueOnce({
+      activeSubscription: 'fake-active-subscription'
+    } as any)
+
+    const response = await getServerSideProps({ 
+      params: { slug: 'my-new-post' } 
+    } as any)
 
     expect(response).toEqual(
       expect.objectContaining({
         props: {
-          posts: [{
+          post: {
             slug: 'my-new-post',
-            title: 'My New Post',
-            excerpt: 'Post excerpt',
-            updatedAt: '28 de setembro de 2021'
-          }]
+            title: 'My new post',
+            content: '<p>Post content</p>',
+            updatedAt: '04 de outubro de 2021'
+          }
         }
       })
     )
